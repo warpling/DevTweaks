@@ -72,9 +72,19 @@ final class TweakPanelWindowManager: NSObject {
     }
 
     /// Presents the tweak panel as a sheet.
-    func presentPanel() {
+    func presentPanel(selectingTab tabName: String? = nil) {
         guard let panelWindow, let rootVC = panelWindow.rootViewController else { return }
         if rootVC.presentedViewController != nil { return }
+
+        // Write tab selection to UserDefaults BEFORE creating the view,
+        // so @AppStorage("DevTweaks.lastTab") initializes with the correct value.
+        if let tabName {
+            var allTabNames = ["Tweaks"]
+            allTabNames.append(contentsOf: tabs.map(\.name))
+            if let index = allTabNames.firstIndex(of: tabName) {
+                UserDefaults.standard.set(index, forKey: "DevTweaks.lastTab")
+            }
+        }
 
         let panelView = TweakPanelView(store: store, tabs: tabs, onDismiss: onDismiss)
         let hostingController = UIHostingController(rootView: panelView)

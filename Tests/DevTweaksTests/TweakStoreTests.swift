@@ -150,6 +150,38 @@ final class TweakStoreTests: XCTestCase {
         XCTAssertEqual(ref.value, 0.46, accuracy: 0.001)
     }
 
+    // MARK: - Type-Inferred TweakRef
+
+    func testRefInferredDouble() {
+        let store = makeStore()
+        let ref: TweakRef<Double> = store.ref("Visual.Animations.duration")
+        XCTAssertEqual(ref.value, 0.46, accuracy: 0.001)
+        ref.value = 1.2
+        XCTAssertEqual(ref.value, 1.2, accuracy: 0.001)
+    }
+
+    func testRefInferredBool() {
+        let store = makeStore()
+        let ref: TweakRef<Bool> = store.ref("Visual.Animations.glassButtons")
+        XCTAssertTrue(ref.value)
+        ref.value = false
+        XCTAssertFalse(ref.value)
+    }
+
+    func testRefInferredCGFloat() {
+        let store = makeStore()
+        let ref: TweakRef<CGFloat> = store.ref("Visual.Layout.spacing")
+        XCTAssertEqual(ref.value, 8.0, accuracy: 0.001)
+    }
+
+    func testRefInferredString() {
+        let store = makeStore()
+        let ref: TweakRef<String> = store.ref("Debug.Network.endpoint")
+        XCTAssertEqual(ref.value, "production")
+        ref.value = "staging"
+        XCTAssertEqual(ref.value, "staging")
+    }
+
     // MARK: - Section Enabled
 
     func testSectionEnabled() {

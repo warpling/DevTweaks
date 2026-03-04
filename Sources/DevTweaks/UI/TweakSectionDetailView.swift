@@ -65,20 +65,20 @@ public struct TweakSectionDetailView: View {
 // MARK: - Master Toggle Row
 
 @available(iOS 16.0, *)
-private struct MasterToggleRow: View {
+public struct MasterToggleRow: View {
     let section: TweakSectionMetadata
     let storage: TweakStorage
     @Binding var refreshID: UUID
     @State private var isEnabled: Bool
 
-    init(section: TweakSectionMetadata, storage: TweakStorage, refreshID: Binding<UUID>) {
+    public init(section: TweakSectionMetadata, storage: TweakStorage, refreshID: Binding<UUID>) {
         self.section = section
         self.storage = storage
         self._refreshID = refreshID
         self._isEnabled = State(initialValue: storage.value(forKey: section.id + ".isEnabled", default: false))
     }
 
-    var body: some View {
+    public var body: some View {
         HStack(spacing: 12) {
             if let color = section.color {
                 Circle()
@@ -98,12 +98,18 @@ private struct MasterToggleRow: View {
 // MARK: - Tweak Row
 
 @available(iOS 16.0, *)
-struct TweakRow: View {
+public struct TweakRow: View {
     let tweak: TweakMetadata
     let storage: TweakStorage
     var isDisabled: Bool = false
 
-    var body: some View {
+    public init(tweak: TweakMetadata, storage: TweakStorage, isDisabled: Bool = false) {
+        self.tweak = tweak
+        self.storage = storage
+        self.isDisabled = isDisabled
+    }
+
+    public var body: some View {
         Group {
             switch tweak.controlType {
             case .toggle:

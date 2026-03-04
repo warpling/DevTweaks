@@ -142,6 +142,15 @@ public final class TweakStore {
         return TweakRef(key: key, defaultValue: typed, storage: storage)
     }
 
+    /// Creates a typed reference handle, inferring the type from context.
+    ///
+    /// ```swift
+    /// static let duration: TweakRef<CGFloat> = store.ref("Visual.Modal Cards.duration")
+    /// ```
+    public func ref<T: Equatable>(_ key: String) -> TweakRef<T> {
+        ref(key, as: T.self)
+    }
+
     // MARK: - Section Queries
 
     /// Whether the master toggle for a section is enabled.

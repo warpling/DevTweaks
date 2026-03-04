@@ -66,10 +66,13 @@ public enum TweakPanel {
     }
 
     /// Programmatically presents the tweak panel.
+    ///
+    /// - Parameter selectingTab: Optional tab name to select on presentation.
+    ///   When `nil`, the panel restores the last-used tab.
     @available(iOS 16.0, *)
-    public static func present() {
+    public static func present(selectingTab: String? = nil) {
         #if DEBUG
-        windowManager?.presentPanel()
+        windowManager?.presentPanel(selectingTab: selectingTab)
         #endif
     }
 
