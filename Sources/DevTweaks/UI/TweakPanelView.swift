@@ -39,6 +39,7 @@ struct TweakPanelView: View {
     let store: TweakStore
     let tabs: [TweakTab]
     let onDismiss: (() -> Void)?
+    var willDismiss: (() -> Void)? = nil
 
     @AppStorage("DevTweaks.lastTab") private var selectedTabIndex: Int = 0
     @Environment(\.dismiss) private var dismiss
@@ -89,6 +90,7 @@ struct TweakPanelView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Done") {
+                        willDismiss?()
                         onDismiss?()
                         dismiss()
                     }

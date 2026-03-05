@@ -112,7 +112,9 @@ final class TweakPanelWindowManager: NSObject {
             }
         }
 
-        let panelView = TweakPanelView(store: store, tabs: tabs, onDismiss: onDismiss)
+        let panelView = TweakPanelView(store: store, tabs: tabs, onDismiss: onDismiss) { [weak self] in
+            self?.panelWindow?.isHidden = true
+        }
         let hostingController = UIHostingController(rootView: panelView)
         hostingController.modalPresentationStyle = .pageSheet
 
