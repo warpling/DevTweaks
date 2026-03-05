@@ -3,23 +3,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "DevTweaks",
+    name: "TweakIt",
     platforms: [
         .iOS(.v16)
     ],
     products: [
         .library(
-            name: "DevTweaks",
-            targets: ["DevTweaks"]
+            name: "TweakIt",
+            targets: ["TweakIt"]
         ),
     ],
     targets: [
         .target(
-            name: "DevTweaks"
+            name: "TweakIt"
         ),
         .testTarget(
-            name: "DevTweaksTests",
-            dependencies: ["DevTweaks"]
+            name: "TweakItTests",
+            dependencies: ["TweakIt"]
         ),
     ]
 )

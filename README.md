@@ -1,20 +1,20 @@
-# DevTweaks
+# TweakIt
 
 **Adjust anything at runtime. Ship nothing to production.**
 
-DevTweaks is a spiritual successor to [SwiftTweaks](https://github.com/bryanjclark/SwiftTweaks) — the beloved library that let you fine-tune your app without recompiling. DevTweaks brings that same magic to modern SwiftUI with a declarative DSL, real-time editing, and zero production overhead.
+TweakIt is a spiritual successor to [SwiftTweaks](https://github.com/bryanjclark/SwiftTweaks) — the beloved library that let you fine-tune your app without recompiling. TweakIt brings that same magic to modern SwiftUI with a declarative DSL, real-time editing, and zero production overhead.
 
 <p align="center">
-  <img src="Assets/panel-categories.png" alt="DevTweaks category browser with custom tabs" width="220">&nbsp;&nbsp;
-  <img src="Assets/realtime-tweaking.gif" alt="Real-time shader tweaking with DevTweaks" width="220">&nbsp;&nbsp;
-  <img src="Assets/panel-sliders.png" alt="DevTweaks sliders with modification indicators" width="220">
+  <img src="Assets/panel-categories.png" alt="TweakIt category browser with custom tabs" width="220">&nbsp;&nbsp;
+  <img src="Assets/realtime-tweaking.gif" alt="Real-time shader tweaking with TweakIt" width="220">&nbsp;&nbsp;
+  <img src="Assets/panel-sliders.png" alt="TweakIt sliders with modification indicators" width="220">
 </p>
 
 ## Why?
 
 Because recompiling to change an animation duration by 0.05 seconds is a crime against your time.
 
-DevTweaks lets you define tweakable parameters once and get a full debug panel for free. Drag sliders, flip toggles, pick options — see changes instantly without a rebuild.
+TweakIt lets you define tweakable parameters once and get a full debug panel for free. Drag sliders, flip toggles, pick options — see changes instantly without a rebuild.
 
 ## Features
 
@@ -32,7 +32,7 @@ DevTweaks lets you define tweakable parameters once and get a full debug panel f
 ### 1. Define your tweaks
 
 ```swift
-import DevTweaks
+import TweakIt
 
 enum AppTweaks {
     static let store = TweakStore {
@@ -120,14 +120,14 @@ TweakPanel.install(
 **Swift Package Manager:**
 
 ```
-https://github.com/warpling/DevTweaks.git
+https://github.com/warpling/TweakIt.git
 ```
 
 iOS 16+ · Swift 5.9+ · Zero dependencies
 
 ## Acknowledgments
 
-DevTweaks is a spiritual successor to [SwiftTweaks](https://github.com/bryanjclark/SwiftTweaks) by [Bryan Clark](https://github.com/bryanjclark), which pioneered the idea of runtime-tweakable parameters for iOS. SwiftTweaks was a joy to use and a huge inspiration — DevTweaks aims to carry that torch forward with a modern Swift DSL and SwiftUI.
+TweakIt is a spiritual successor to [SwiftTweaks](https://github.com/bryanjclark/SwiftTweaks) by [Bryan Clark](https://github.com/bryanjclark), which pioneered the idea of runtime-tweakable parameters for iOS. SwiftTweaks was a joy to use and a huge inspiration — TweakIt aims to carry that torch forward with a modern Swift DSL and SwiftUI.
 
 ## License
 
