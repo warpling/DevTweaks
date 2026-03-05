@@ -91,7 +91,8 @@ final class TweakPanelWindowManager: NSObject {
         hostingController.modalPresentationStyle = .pageSheet
 
         if let sheet = hostingController.sheetPresentationController {
-            sheet.detents = [.large()]
+            sheet.detents = [.medium(), .large()]
+            sheet.selectedDetentIdentifier = .medium
             sheet.prefersGrabberVisible = true
             sheet.delegate = self
         }

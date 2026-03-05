@@ -1,0 +1,122 @@
+//
+//  DemoTweaks.swift
+//  DevTweaksDemo
+//
+//  TweakStore DSL definition for all shader parameters.
+//
+
+import DevTweaks
+import Foundation
+
+// MARK: - Shader Type
+
+enum ShaderType: String, CaseIterable {
+    case plasma
+    case aurora
+    case marble
+    case voronoi
+
+    var name: String {
+        switch self {
+        case .plasma:  return "Plasma"
+        case .aurora:  return "Aurora"
+        case .marble:  return "Marble"
+        case .voronoi: return "Voronoi"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .plasma:  return "waveform"
+        case .aurora:  return "sparkles"
+        case .marble:  return "water.waves"
+        case .voronoi: return "hexagon"
+        }
+    }
+}
+
+// MARK: - Store Definition
+
+enum DemoTweaks {
+    static let store = TweakStore {
+        // MARK: Plasma
+        TweakCategory("Plasma", icon: "waveform") {
+            TweakSection("Motion") {
+                TweakDefinition("speed", default: 1.0, range: 0.0...5.0)
+                TweakDefinition("scale", default: 3.0, range: 0.5...10.0)
+            }
+            TweakSection("Color") {
+                TweakDefinition("waveCount", default: 4, range: 1.0...8.0)
+                TweakDefinition("distortion", default: 0.5, range: 0.0...2.0)
+                TweakDefinition("saturation", default: 0.7, range: 0.0...1.0)
+                TweakDefinition("brightness", default: 0.5, range: 0.0...1.0)
+                TweakDefinition("palette", default: "neon", options: ["lava", "ocean", "neon", "pastel", "mono"])
+            }
+        }
+
+        // MARK: Aurora
+        TweakCategory("Aurora", icon: "sparkles") {
+            TweakSection("Motion") {
+                TweakDefinition("speed", default: 0.8, range: 0.0...3.0)
+                TweakDefinition("amplitude", default: 0.3, range: 0.0...1.0)
+            }
+            TweakSection("Shape") {
+                TweakDefinition("layers", default: 4, range: 1.0...8.0)
+                TweakDefinition("verticalCenter", default: 0.4, range: 0.0...1.0)
+                TweakDefinition("bandWidth", default: 0.15, range: 0.02...0.5)
+            }
+            TweakSection("Style") {
+                TweakDefinition("brightness", default: 0.8, range: 0.0...1.5)
+                TweakDefinition("palette", default: "arctic", options: ["arctic", "solar", "cosmic", "fire"])
+                TweakDefinition("starField", default: true)
+            }
+        }
+
+        // MARK: Marble
+        TweakCategory("Marble", icon: "water.waves") {
+            TweakSection("Motion") {
+                TweakDefinition("speed", default: 0.5, range: 0.0...3.0)
+                TweakDefinition("turbulence", default: 1.0, range: 0.0...3.0)
+            }
+            TweakSection("Color") {
+                TweakDefinition("octaves", default: 5, range: 1.0...8.0)
+                TweakDefinition("displacement", default: 1.5, range: 0.0...5.0)
+                TweakDefinition("bandFrequency", default: 5.0, range: 1.0...20.0)
+                TweakDefinition("colorSeparation", default: 0.1, range: 0.0...0.5)
+                TweakDefinition("palette", default: "marble", options: ["marble", "ink", "oil", "candy"])
+            }
+        }
+
+        // MARK: Voronoi
+        TweakCategory("Voronoi", icon: "hexagon") {
+            TweakSection("Cells") {
+                TweakDefinition("cellDensity", default: 5.0, range: 2.0...15.0)
+                TweakDefinition("morphSpeed", default: 0.8, range: 0.0...3.0)
+            }
+            TweakSection("Edges") {
+                TweakDefinition("edgeWidth", default: 0.05, range: 0.0...0.3)
+                TweakDefinition("edgeGlow", default: 0.5, range: 0.0...2.0)
+            }
+            TweakSection("Style") {
+                TweakDefinition("fillMode", default: "gradient", options: ["solid", "gradient", "wireframe"])
+                TweakDefinition("palette", default: "crystal", options: ["crystal", "neon", "earth", "mono"])
+                TweakDefinition("invert", default: false)
+            }
+        }
+
+        // MARK: Post-Processing
+        TweakCategory("Post-Processing", icon: "camera.filters") {
+            TweakSection("Film Grain") {
+                TweakDefinition("enabled", default: false)
+                TweakDefinition("amount", default: 0.15, range: 0.0...0.5)
+                TweakDefinition("size", default: 1.5, range: 0.5...4.0)
+                TweakDefinition("animated", default: true)
+            }
+            TweakSection("Vignette") {
+                TweakDefinition("enabled", default: false)
+                TweakDefinition("strength", default: 0.5, range: 0.0...1.5)
+                TweakDefinition("radius", default: 0.7, range: 0.2...1.5)
+            }
+        }
+    }
+}

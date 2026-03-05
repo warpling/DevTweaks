@@ -8,6 +8,28 @@
 #if DEBUG
 import SwiftUI
 
+// MARK: - Disable Interactive Pop Gesture
+
+/// Prevents the NavigationStack's swipe-back gesture from firing when
+/// the user drags sliders near the screen edge (especially at min/max values).
+/// Navigation still works via the nav bar back button and the "Done" dismiss button.
+@available(iOS 16.0, *)
+private struct DisableInteractivePopGesture: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        DisablePopGestureVC()
+    }
+    func updateUIViewController(_ vc: UIViewController, context: Context) {}
+}
+
+private class DisablePopGestureVC: UIViewController {
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+}
+
+// MARK: - Panel View
+
 /// Root view for the tweak panel.
 ///
 /// When custom tabs are provided, shows a segmented picker at the top.
@@ -61,6 +83,7 @@ struct TweakPanelView: View {
                     }
                 }
             }
+            .background(DisableInteractivePopGesture())
             .navigationTitle(tabs.isEmpty ? "Tweaks" : "Dev Tools")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
