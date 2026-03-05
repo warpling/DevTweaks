@@ -20,6 +20,7 @@ struct ListHighlightButtonStyle: PrimitiveButtonStyle {
     struct ListHighlightButton: View {
         let configuration: Configuration
         @State private var isPressed = false
+        @State private var pressWorkItem: DispatchWorkItem?
 
         var body: some View {
             configuration.label
@@ -27,7 +28,17 @@ struct ListHighlightButtonStyle: PrimitiveButtonStyle {
                 .scaleEffect(isPressed ? 0.97 : 1.0)
                 .animation(isPressed ? nil : .easeOut(duration: 0.2), value: isPressed)
                 .onLongPressGesture(minimumDuration: 9999, pressing: { pressing in
-                    isPressed = pressing
+                    pressWorkItem?.cancel()
+                    if pressing {
+                        isPressed = true
+                    } else {
+                        // Delay release so quick taps still show visible feedback.
+                        // Without this, SwiftUI coalesces the true→false in the same
+                        // render pass and no visual change is perceived.
+                        let item = DispatchWorkItem { isPressed = false }
+                        pressWorkItem = item
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: item)
+                    }
                 }, perform: { })
                 .simultaneousGesture(TapGesture().onEnded {
                     configuration.trigger()

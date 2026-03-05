@@ -104,6 +104,29 @@ enum DemoTweaks {
             }
         }
 
+        // MARK: Actions
+        TweakCategory("Actions", icon: "bolt.fill") {
+            TweakSection("Presets") {
+                TweakDefinition("Reset All to Defaults", action: {
+                    print("🔄 Reset all tweaks to defaults")
+                })
+                TweakDefinition("Apply Neon Preset", action: {
+                    print("🎨 Applied neon preset")
+                })
+                TweakDefinition("Apply Calm Preset", action: {
+                    print("🌊 Applied calm preset")
+                })
+            }
+            TweakSection("Export") {
+                TweakDefinition("Copy Config to Clipboard", action: {
+                    print("📋 Config copied to clipboard")
+                })
+                TweakDefinition("Share Screenshot", action: {
+                    print("📤 Sharing screenshot")
+                })
+            }
+        }
+
         // MARK: Post-Processing
         TweakCategory("Post-Processing", icon: "camera.filters") {
             TweakSection("Film Grain") {

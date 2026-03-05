@@ -30,8 +30,24 @@ public struct TweaksListView: View {
     public var body: some View {
         List {
             ForEach(filteredCategories) { category in
-                Section {
-                    if !collapsedCategories.contains(category.id) || !searchText.isEmpty {
+                let isCollapsed = collapsedCategories.contains(category.id) && searchText.isEmpty
+
+                if isCollapsed {
+                    // Header only — no Section wrapper, no extra chrome
+                    CategoryHeaderView(
+                        category: category,
+                        storage: storage,
+                        isCollapsed: true
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            collapsedCategories.remove(category.id)
+                            UserDefaults.standard.set(Array(collapsedCategories), forKey: "DevTweaks.collapsedCategories")
+                        }
+                    }
+                    .textCase(nil)
+                    .listRowBackground(Color(.systemGroupedBackground))
+                } else {
+                    Section {
                         ForEach(filteredSections(for: category)) { section in
                             NavigationLink {
                                 TweakSectionDetailView(section: section, storage: storage)
@@ -39,23 +55,19 @@ public struct TweaksListView: View {
                                 SectionRowView(section: section, storage: storage)
                             }
                         }
-                    }
-                } header: {
-                    CategoryHeaderView(
-                        category: category,
-                        storage: storage,
-                        isCollapsed: collapsedCategories.contains(category.id) && searchText.isEmpty
-                    ) {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            if collapsedCategories.contains(category.id) {
-                                collapsedCategories.remove(category.id)
-                            } else {
+                    } header: {
+                        CategoryHeaderView(
+                            category: category,
+                            storage: storage,
+                            isCollapsed: false
+                        ) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
                                 collapsedCategories.insert(category.id)
+                                UserDefaults.standard.set(Array(collapsedCategories), forKey: "DevTweaks.collapsedCategories")
                             }
-                            UserDefaults.standard.set(Array(collapsedCategories), forKey: "DevTweaks.collapsedCategories")
                         }
+                        .textCase(nil)
                     }
-                    .textCase(nil)
                 }
             }
         }
