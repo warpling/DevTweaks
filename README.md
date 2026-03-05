@@ -81,6 +81,8 @@ The control is inferred from your default value and parameters:
 | `TweakDefinition("env", default: "prod", options: ["prod", "staging"])` | Picker |
 | `TweakDefinition("reset", action: { ... })` | Action button |
 
+Action buttons don't store a value — they fire a closure on tap. Great for debug shortcuts like resetting state or clearing caches.
+
 ## TweakRef — Typed Handles
 
 For ergonomic access, `TweakRef` gives you a typed handle with modification tracking:

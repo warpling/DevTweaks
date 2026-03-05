@@ -39,6 +39,28 @@ The control type is inferred from the default value and any additional parameter
 - **String** defaults produce a text field. Add an `options` array to get a segmented picker instead.
 - **Action** tweaks have no stored value — they fire a closure on tap.
 
+## Action Buttons
+
+Unlike other tweaks, action definitions don't store a value. They render as a tappable button that fires a closure — useful for debug shortcuts like resetting state, clearing caches, or triggering test events:
+
+```swift
+TweakCategory("Debug", icon: "ladybug") {
+    TweakSection("Actions") {
+        TweakDefinition("Reset Onboarding", action: {
+            UserDefaults.standard.removeObject(forKey: "hasSeenOnboarding")
+        })
+        TweakDefinition("Crash (Test)", action: {
+            fatalError("Test crash from DevTweaks")
+        })
+        TweakDefinition("Clear Image Cache", action: {
+            ImageCache.shared.removeAll()
+        })
+    }
+}
+```
+
+Action buttons can live alongside regular tweaks in the same section. They appear as tappable rows in the panel UI.
+
 ## Categories
 
 A ``TweakCategory`` groups related sections under a collapsible header with an SF Symbol icon:
