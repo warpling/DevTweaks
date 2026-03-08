@@ -170,43 +170,42 @@ private class PanelWindow: UIWindow {
 extension UIWindow {
     private static var _tweakItShakeSwizzled = false
 
-    /// Swizzles `motionEnded` on UIWindow to detect device shakes.
+    /// Adds a `motionEnded` override on `UIWindow` to detect device shakes.
     /// Idempotent — safe to call multiple times.
+    ///
+    /// Uses `class_replaceMethod` + `imp_implementationWithBlock` instead of
+    /// the traditional selector-swap pattern. This avoids two pitfalls:
+    ///   1. `motionEnded` lives on `UIResponder`, not `UIWindow` — a naive
+    ///      `method_exchangeImplementations` corrupts every `UIResponder` subclass.
+    ///   2. UIResponder's implementation uses `_cmd` to forward up the responder
+    ///      chain, so the forwarded selector must stay `motionEnded:with:`.
     static func tweakIt_enableShakeToToggle() {
         guard !_tweakItShakeSwizzled else { return }
         _tweakItShakeSwizzled = true
 
-        let original = #selector(UIWindow.motionEnded(_:with:))
-        let swizzled = #selector(UIWindow.tweakIt_motionEnded(_:with:))
+        let sel = #selector(UIWindow.motionEnded(_:with:))
+        guard let method = class_getInstanceMethod(UIWindow.self, sel) else { return }
+        let originalIMP = method_getImplementation(method)
 
-        guard let originalMethod = class_getInstanceMethod(UIWindow.self, original),
-              let swizzledMethod = class_getInstanceMethod(UIWindow.self, swizzled)
-        else { return }
+        // Cast the original IMP so we can call it with the correct _cmd selector.
+        typealias MotionEndedFn = @convention(c) (AnyObject, Selector, UIEvent.EventSubtype, UIEvent?) -> Void
+        let originalFn = unsafeBitCast(originalIMP, to: MotionEndedFn.self)
 
-        // UIWindow inherits motionEnded from UIResponder. We must add our
-        // swizzled IMP under the *original* selector on UIWindow itself so the
-        // exchange stays scoped to UIWindow and doesn't corrupt UIResponder's
-        // method (which would crash every other UIResponder subclass).
-        if class_addMethod(UIWindow.self, original, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod)) {
-            // Successfully added — UIWindow now has its own motionEnded pointing
-            // to our swizzled IMP. Point the swizzled selector at the inherited
-            // (super) implementation so the forwarding call still works.
-            method_setImplementation(swizzledMethod, method_getImplementation(originalMethod))
-        } else {
-            // UIWindow already had its own motionEnded — safe to exchange directly.
-            method_exchangeImplementations(originalMethod, swizzledMethod)
-        }
-    }
+        let block: @convention(block) (AnyObject, UIEvent.EventSubtype, UIEvent?) -> Void = { obj, motion, event in
+            // Forward to the original implementation with the correct selector
+            // so UIResponder's _cmd-based responder chain forwarding works.
+            originalFn(obj, sel, motion, event)
 
-    @objc private func tweakIt_motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
-        // Call original implementation (method is swizzled, so this calls the real motionEnded)
-        tweakIt_motionEnded(motion, with: event)
-
-        if motion == .motionShake {
-            if #available(iOS 16.0, *) {
-                TweakPanel.buttonState?.toggle()
+            if motion == .motionShake {
+                if #available(iOS 16.0, *) {
+                    TweakPanel.buttonState?.toggle()
+                }
             }
         }
+
+        // class_replaceMethod adds a UIWindow-scoped override when UIWindow
+        // doesn't have its own motionEnded (inherits from UIResponder).
+        class_replaceMethod(UIWindow.self, sel, imp_implementationWithBlock(block), method_getTypeEncoding(method))
     }
 }
 #endif
