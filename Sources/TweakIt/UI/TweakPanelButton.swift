@@ -29,6 +29,7 @@ public final class TweakPanelButtonState: ObservableObject {
 struct TweakPanelButtonContainer: View {
     @ObservedObject var state: TweakPanelButtonState
     let icon: String
+    let bottomOffset: CGFloat
     let action: () -> Void
 
     var body: some View {
@@ -41,6 +42,7 @@ struct TweakPanelButtonContainer: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding(16)
+            .padding(.bottom, bottomOffset)
         } else {
             Group {
                 if state.isVisible {
@@ -50,6 +52,7 @@ struct TweakPanelButtonContainer: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding(16)
+            .padding(.bottom, bottomOffset)
         }
     }
 

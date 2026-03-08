@@ -35,6 +35,7 @@ public enum TweakPanel {
     ///   - tabs: Optional custom tabs to show alongside the tweaks browser.
     ///   - buttonIcon: SF Symbol name for the floating button. Defaults to `"slider.vertical.3"`.
     ///   - buttonInitiallyVisible: Whether the floating button starts visible. Defaults to `true`.
+    ///   - buttonBottomOffset: Extra bottom padding for the floating button (e.g., to clear a tab bar). Defaults to `0`.
     ///   - shakeToToggleButton: Whether shaking the device toggles button visibility. Defaults to `true`.
     ///   - onDismiss: Optional closure called when the panel is dismissed.
     @available(iOS 16.0, *)
@@ -43,6 +44,7 @@ public enum TweakPanel {
         tabs: [TweakTab] = [],
         buttonIcon: String = "slider.vertical.3",
         buttonInitiallyVisible: Bool = true,
+        buttonBottomOffset: CGFloat = 0,
         shakeToToggleButton: Bool = true,
         onDismiss: (() -> Void)? = nil
     ) {
@@ -52,6 +54,7 @@ public enum TweakPanel {
             tabs: tabs,
             buttonIcon: buttonIcon,
             buttonInitiallyVisible: buttonInitiallyVisible,
+            buttonBottomOffset: buttonBottomOffset,
             shakeToToggleButton: shakeToToggleButton,
             onDismiss: onDismiss
         )

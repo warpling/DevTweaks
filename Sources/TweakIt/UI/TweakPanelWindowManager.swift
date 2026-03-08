@@ -18,6 +18,7 @@ final class TweakPanelWindowManager: NSObject {
     let tabs: [TweakTab]
     let onDismiss: (() -> Void)?
     let buttonIcon: String
+    let buttonBottomOffset: CGFloat
     let shakeToToggleButton: Bool
 
     let buttonState: TweakPanelButtonState
@@ -32,12 +33,14 @@ final class TweakPanelWindowManager: NSObject {
         tabs: [TweakTab],
         buttonIcon: String,
         buttonInitiallyVisible: Bool,
+        buttonBottomOffset: CGFloat,
         shakeToToggleButton: Bool,
         onDismiss: (() -> Void)?
     ) {
         self.store = store
         self.tabs = tabs
         self.buttonIcon = buttonIcon
+        self.buttonBottomOffset = buttonBottomOffset
         self.shakeToToggleButton = shakeToToggleButton
         self.onDismiss = onDismiss
         self.buttonState = TweakPanelButtonState(initiallyVisible: buttonInitiallyVisible)
@@ -76,7 +79,7 @@ final class TweakPanelWindowManager: NSObject {
         btnWin.windowLevel = UIWindow.Level.normal + 9
         btnWin.backgroundColor = .clear
 
-        let container = TweakPanelButtonContainer(state: buttonState, icon: buttonIcon) { [weak self] in
+        let container = TweakPanelButtonContainer(state: buttonState, icon: buttonIcon, bottomOffset: buttonBottomOffset) { [weak self] in
             self?.presentPanel()
         }
         let hostingController = UIHostingController(rootView: container)
