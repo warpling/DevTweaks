@@ -11,6 +11,7 @@ import TweakIt
 @main
 struct TweakItExampleApp: App {
     init() {
+        let useFloating: Bool = DemoTweaks.store.storage.value(forKey: "App.Panel.useFloatingButton", default: false)
         // Defer to next run loop — UIWindowScene isn't available during App.init()
         DispatchQueue.main.async {
             TweakPanel.install(
@@ -22,7 +23,8 @@ struct TweakItExampleApp: App {
                     TweakTab("Voronoi", icon: "hexagon") { ShaderTabView(categoryName: "Voronoi") },
                 ],
                 buttonIcon: "gearshape",
-                buttonInitiallyVisible: false // Using the tab bar action button instead
+                buttonInitiallyVisible: useFloating,
+                buttonBottomOffset: 60
             )
         }
     }

@@ -104,6 +104,13 @@ enum DemoTweaks {
             }
         }
 
+        // MARK: App
+        TweakCategory("App", icon: "app.badge") {
+            TweakSection("Panel") {
+                TweakDefinition("useFloatingButton", default: false)
+            }
+        }
+
         // MARK: Actions
         TweakCategory("Actions", icon: "bolt.fill") {
             TweakSection("Presets") {

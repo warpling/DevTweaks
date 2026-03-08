@@ -9,7 +9,12 @@ import SwiftUI
 import TweakIt
 
 struct ContentView: View {
+    @ObservedObject private var storage = DemoTweaks.store.storage
     @State private var selectedTab: AppTab = .shader(.plasma)
+
+    private var useFloatingButton: Bool {
+        storage.value(forKey: "App.Panel.useFloatingButton", default: false)
+    }
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -20,8 +25,10 @@ struct ContentView: View {
                 }
             }
 
-            Tab("Settings", systemImage: "gearshape", value: AppTab.settings, role: .search) {
-                Color.clear
+            if !useFloatingButton {
+                Tab("Settings", systemImage: "gearshape", value: AppTab.settings, role: .search) {
+                    Color.clear
+                }
             }
         }
         .onChange(of: selectedTab) { oldValue, newValue in
@@ -29,6 +36,9 @@ struct ContentView: View {
                 selectedTab = oldValue
                 TweakPanel.present()
             }
+        }
+        .onChange(of: useFloatingButton) { _, useFloating in
+            TweakPanel.buttonState?.isVisible = useFloating
         }
     }
 }
