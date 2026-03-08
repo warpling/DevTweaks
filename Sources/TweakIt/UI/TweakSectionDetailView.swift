@@ -91,6 +91,12 @@ public struct MasterToggleRow: View {
                     storage.setValue(newValue, forKey: section.id + ".isEnabled", default: false)
                     refreshID = UUID()
                 }
+                .onChange(of: refreshID) { _ in
+                    let storedValue: Bool = storage.value(forKey: section.id + ".isEnabled", default: false)
+                    if isEnabled != storedValue {
+                        isEnabled = storedValue
+                    }
+                }
         }
     }
 }

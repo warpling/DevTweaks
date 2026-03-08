@@ -101,7 +101,7 @@ public struct TweaksListView: View {
 @available(iOS 16.0, *)
 private struct CategoryHeaderView: View {
     let category: TweakCategoryMetadata
-    let storage: TweakStorage
+    @ObservedObject var storage: TweakStorage
     var isCollapsed: Bool = false
     var onToggle: (() -> Void)? = nil
 
@@ -136,7 +136,7 @@ private struct CategoryHeaderView: View {
 @available(iOS 16.0, *)
 private struct SectionRowView: View {
     let section: TweakSectionMetadata
-    let storage: TweakStorage
+    @ObservedObject var storage: TweakStorage
 
     private var isEnabled: Bool {
         guard section.hasMasterToggle else { return true }

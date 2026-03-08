@@ -94,9 +94,12 @@ public final class TweakStorage: ObservableObject {
         // Check if setting back to default
         if value == defaultValue {
             defaults.removeObject(forKey: prefixedKey)
-            var keys = modifiedKeys
-            keys.remove(key)
-            modifiedKeys = keys
+            let keys = modifiedKeys
+            if keys.contains(key) {
+                var mutableKeys = keys
+                mutableKeys.remove(key)
+                modifiedKeys = mutableKeys
+            }
             return
         }
 
@@ -107,10 +110,13 @@ public final class TweakStorage: ObservableObject {
             defaults.set(value, forKey: prefixedKey)
         }
 
-        // Mark as modified
-        var keys = modifiedKeys
-        keys.insert(key)
-        modifiedKeys = keys
+        // Mark as modified (only update if not already tracked)
+        let keys = modifiedKeys
+        if !keys.contains(key) {
+            var mutableKeys = keys
+            mutableKeys.insert(key)
+            modifiedKeys = mutableKeys
+        }
         #endif
     }
 

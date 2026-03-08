@@ -25,6 +25,7 @@ final class TweakPanelWindowManager: NSObject {
     private var buttonWindow: PassThroughWindow?
     private var panelWindow: UIWindow?
     private var sceneObserver: NSObjectProtocol?
+    private var activationObserver: NSObjectProtocol?
 
     init(
         store: TweakStore,
@@ -95,6 +96,18 @@ final class TweakPanelWindowManager: NSObject {
         rootVC.view.backgroundColor = .clear
         pnlWin.rootViewController = rootVC
         self.panelWindow = pnlWin
+
+        // Safety: hide panelWindow if it ends up visible with no sheet after lifecycle transitions
+        activationObserver = NotificationCenter.default.addObserver(
+            forName: UIScene.didActivateNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, let panelWindow = self.panelWindow, !panelWindow.isHidden else { return }
+            if panelWindow.rootViewController?.presentedViewController == nil {
+                panelWindow.isHidden = true
+            }
+        }
     }
 
     /// Presents the tweak panel as a sheet.

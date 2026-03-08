@@ -10,12 +10,12 @@ import UIKit
 /// A UIWindow subclass that allows touches to pass through transparent areas.
 /// Used for floating buttons and overlay UIs that shouldn't block interaction.
 public class PassThroughWindow: UIWindow {
-    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        for subview in rootViewController?.view.subviews ?? [] {
-            if !subview.isHidden && subview.isUserInteractionEnabled && subview.point(inside: convert(point, to: subview), with: event) {
-                return true
-            }
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let result = super.hitTest(point, with: event)
+        // Pass through if the only hit is the root view itself (no interactive content at this point)
+        if result === rootViewController?.view {
+            return nil
         }
-        return false
+        return result
     }
 }
