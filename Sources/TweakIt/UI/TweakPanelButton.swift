@@ -13,6 +13,10 @@ import SwiftUI
 public final class TweakPanelButtonState: ObservableObject {
     @Published public var isVisible: Bool
 
+    /// Button frame in screen coordinates, updated by SwiftUI geometry.
+    /// Read by PassThroughWindow for hit testing — not @Published to avoid re-renders.
+    var buttonFrame: CGRect = .zero
+
     public init(initiallyVisible: Bool = true) {
         self.isVisible = initiallyVisible
     }
@@ -21,6 +25,16 @@ public final class TweakPanelButtonState: ObservableObject {
         withAnimation(.bouncy) {
             isVisible.toggle()
         }
+    }
+}
+
+// MARK: - Button Frame Preference Key
+
+@available(iOS 16.0, *)
+private struct ButtonFrameKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
     }
 }
 
@@ -38,25 +52,41 @@ struct TweakPanelButtonContainer: View {
                 if state.isVisible {
                     TweakPanelFloatingButton(icon: icon, action: action)
                         .glassEffectID("tweakItButton", in: glassNamespace)
+                        .reportButtonFrame()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding(16)
             .padding(.bottom, bottomOffset)
+            .onPreferenceChange(ButtonFrameKey.self) { state.buttonFrame = $0 }
         } else {
             Group {
                 if state.isVisible {
                     TweakPanelFloatingButton(icon: icon, action: action)
                         .transition(.scale.combined(with: .opacity))
+                        .reportButtonFrame()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .padding(16)
             .padding(.bottom, bottomOffset)
+            .onPreferenceChange(ButtonFrameKey.self) { state.buttonFrame = $0 }
         }
     }
 
     @Namespace private var glassNamespace
+}
+
+@available(iOS 16.0, *)
+private extension View {
+    func reportButtonFrame() -> some View {
+        background(
+            GeometryReader { geo in
+                Color.clear
+                    .preference(key: ButtonFrameKey.self, value: geo.frame(in: .global))
+            }
+        )
+    }
 }
 
 /// The floating button itself.

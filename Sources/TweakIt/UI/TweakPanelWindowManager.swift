@@ -78,6 +78,7 @@ final class TweakPanelWindowManager: NSObject {
         btnWin.windowScene = scene
         btnWin.windowLevel = UIWindow.Level.normal + 9
         btnWin.backgroundColor = .clear
+        btnWin.buttonState = buttonState
 
         let container = TweakPanelButtonContainer(state: buttonState, icon: buttonIcon, bottomOffset: buttonBottomOffset) { [weak self] in
             self?.presentPanel()
