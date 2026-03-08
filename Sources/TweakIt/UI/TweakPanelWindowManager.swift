@@ -183,7 +183,19 @@ extension UIWindow {
               let swizzledMethod = class_getInstanceMethod(UIWindow.self, swizzled)
         else { return }
 
-        method_exchangeImplementations(originalMethod, swizzledMethod)
+        // UIWindow inherits motionEnded from UIResponder. We must add our
+        // swizzled IMP under the *original* selector on UIWindow itself so the
+        // exchange stays scoped to UIWindow and doesn't corrupt UIResponder's
+        // method (which would crash every other UIResponder subclass).
+        if class_addMethod(UIWindow.self, original, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod)) {
+            // Successfully added — UIWindow now has its own motionEnded pointing
+            // to our swizzled IMP. Point the swizzled selector at the inherited
+            // (super) implementation so the forwarding call still works.
+            method_setImplementation(swizzledMethod, method_getImplementation(originalMethod))
+        } else {
+            // UIWindow already had its own motionEnded — safe to exchange directly.
+            method_exchangeImplementations(originalMethod, swizzledMethod)
+        }
     }
 
     @objc private func tweakIt_motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {

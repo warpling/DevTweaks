@@ -115,6 +115,23 @@ TweakPanel.install(
 )
 ```
 
+## Shake to Toggle
+
+By default, shaking the device toggles the floating button's visibility. This uses method swizzling on `UIWindow.motionEnded(_:with:)` (scoped to `UIWindow` only, debug builds only).
+
+If you prefer to avoid swizzling, disable it and trigger the button yourself:
+
+```swift
+TweakPanel.install(store: AppTweaks.store, shakeToToggleButton: false)
+```
+
+You can then toggle the button programmatically via `TweakPanel.buttonState`:
+
+```swift
+// In your own shake handler or gesture recognizer:
+TweakPanel.buttonState?.toggle()
+```
+
 ## Installation
 
 **Swift Package Manager:**
