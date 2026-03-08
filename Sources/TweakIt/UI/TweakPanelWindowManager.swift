@@ -89,8 +89,8 @@ final class TweakPanelWindowManager: NSObject {
         btnWin.isHidden = false
         self.buttonWindow = btnWin
 
-        // Panel window (hidden until presented)
-        let pnlWin = UIWindow(windowScene: scene)
+        // Panel window (hidden until presented, passes touches when no sheet is up)
+        let pnlWin = PanelWindow(windowScene: scene)
         pnlWin.windowLevel = UIWindow.Level.normal + 10
         pnlWin.backgroundColor = .clear
         pnlWin.isHidden = true
@@ -150,6 +150,18 @@ extension TweakPanelWindowManager: UISheetPresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         panelWindow?.isHidden = true
         onDismiss?()
+    }
+}
+
+// MARK: - Panel Window
+
+/// A UIWindow that passes all touches through when no view controller is presented.
+/// This prevents the panel window from blocking the app when the sheet is dismissed
+/// programmatically (e.g., from an action button) — `presentationControllerDidDismiss`
+/// only fires for interactive (swipe) dismissals.
+private class PanelWindow: UIWindow {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return rootViewController?.presentedViewController != nil
     }
 }
 
