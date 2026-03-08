@@ -86,7 +86,7 @@ public enum TweakPanel {
     ///
     /// Use this as your app's main window if you want the gesture shortcut:
     /// ```swift
-    /// window = TweakPanel.makeWindow(frame: UIScreen.main.bounds)
+    /// window = TweakPanel.makeWindow(windowScene: windowScene)
     /// ```
     @available(iOS 16.0, *)
     public static func makeWindow(frame: CGRect) -> UIWindow {

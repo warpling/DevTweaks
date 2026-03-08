@@ -74,8 +74,7 @@ final class TweakPanelWindowManager: NSObject {
         guard buttonWindow == nil else { return }
 
         // Button window (always visible, touch-transparent)
-        let btnWin = PassThroughWindow(frame: UIScreen.main.bounds)
-        btnWin.windowScene = scene
+        let btnWin = PassThroughWindow(windowScene: scene)
         btnWin.windowLevel = UIWindow.Level.normal + 9
         btnWin.backgroundColor = .clear
         btnWin.buttonState = buttonState
@@ -91,8 +90,7 @@ final class TweakPanelWindowManager: NSObject {
         self.buttonWindow = btnWin
 
         // Panel window (hidden until presented)
-        let pnlWin = UIWindow(frame: UIScreen.main.bounds)
-        pnlWin.windowScene = scene
+        let pnlWin = UIWindow(windowScene: scene)
         pnlWin.windowLevel = UIWindow.Level.normal + 10
         pnlWin.backgroundColor = .clear
         pnlWin.isHidden = true
