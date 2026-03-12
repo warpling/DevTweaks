@@ -3,16 +3,15 @@
 //  TweakIt
 //
 //  Typed reference handle for reading/writing tweak values.
-//  In release builds, `.value` returns the default with zero overhead.
+//  When TweakIt is disabled, `.value` returns the default with zero overhead.
 //
 
 import Foundation
 
 /// A typed handle to a tweak value stored in a `TweakStore`.
 ///
-/// In debug builds, reads and writes go through `TweakStorage`. In release builds,
-/// the getter returns the compile-time default directly, allowing the compiler to
-/// inline and constant-fold the value.
+/// When TweakIt is enabled, reads and writes go through `TweakStorage`. When disabled,
+/// the getter returns the default directly.
 ///
 /// ```swift
 /// let duration = store.ref("Visual.Modal Cards.duration", as: CGFloat.self)
@@ -30,35 +29,27 @@ public final class TweakRef<T: Equatable> {
         self.storage = storage
     }
 
-    /// The current tweak value. Returns the persisted override in debug, or the default in release.
+    /// The current tweak value. Returns the persisted override when enabled, or the default when disabled.
     public var value: T {
         get {
-            #if DEBUG
+            guard TweakIt.isEnabled else { return defaultValue }
             return storage.value(forKey: key, default: defaultValue)
-            #else
-            return defaultValue
-            #endif
         }
         set {
-            #if DEBUG
+            guard TweakIt.isEnabled else { return }
             storage.setValue(newValue, forKey: key, default: defaultValue)
-            #endif
         }
     }
 
     /// Whether this tweak has been modified from its default.
     public var isModified: Bool {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return false }
         return storage.isModified(key: key)
-        #else
-        return false
-        #endif
     }
 
     /// Reset this tweak to its default value.
     public func reset() {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
         storage.reset(key: key)
-        #endif
     }
 }

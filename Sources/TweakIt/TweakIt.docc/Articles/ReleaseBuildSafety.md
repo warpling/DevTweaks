@@ -1,14 +1,14 @@
 # Release Build Safety
 
-TweakIt compiles away completely in release builds.
+TweakIt is fully inert in release builds by default.
 
 ## Overview
 
-The library is designed so that your shipping binary pays zero cost for debug tweaks. All UI code is gated behind `#if DEBUG`, and value access through ``TweakRef`` returns compile-time constants in release builds.
+The library is designed so that your shipping binary pays zero cost for debug tweaks. When ``TweakIt/isEnabled`` is `false` (the default in non-debug builds), all UI installation no-ops and all value access through ``TweakRef`` returns defaults directly.
 
-## What Happens in Release Builds
+## What Happens When TweakIt Is Disabled
 
-| API | Release behavior |
+| API | Behavior when disabled |
 |---|---|
 | ``TweakPanel/install(store:tabs:buttonIcon:buttonInitiallyVisible:onDismiss:)`` | No-op |
 | ``TweakPanel/present(selectingTab:)`` | No-op |
@@ -22,33 +22,29 @@ The library is designed so that your shipping binary pays zero cost for debug tw
 
 ## How It Works
 
-The library uses two layers of compile-time gating:
+TweakIt uses a single runtime toggle — ``TweakIt/isEnabled`` — to gate all functionality:
 
-### UI Layer — `#if DEBUG`
+- In `DEBUG` builds, `isEnabled` defaults to `true`.
+- In all other builds, `isEnabled` defaults to `false`.
 
-All panel UI code — windows, buttons, hosting controllers, SwiftUI views — is wrapped in `#if DEBUG` blocks. In release builds, these types don't exist in the binary at all.
+Every public entry point checks this flag and short-circuits when disabled. The UI types still exist in the binary but are never instantiated, so the runtime cost is effectively zero.
 
-### Value Layer — Inlineable Defaults
+### Value Layer — Runtime Guards
 
-``TweakRef/value`` checks `#if DEBUG` internally:
+``TweakRef/value`` checks `isEnabled` internally:
 
 ```swift
 public var value: T {
     get {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return defaultValue }
         return storage.value(forKey: key, default: defaultValue)
-        #else
-        return defaultValue
-        #endif
     }
 }
 ```
 
-In release builds, the getter is a simple return of a stored constant. The compiler can inline this and constant-fold the result, making it equivalent to using a literal value.
+When disabled, the getter is a simple return of a stored constant.
 
 ## Recommended Pattern
-
-Wrap your ``TweakPanel/install(store:tabs:buttonIcon:buttonInitiallyVisible:onDismiss:)`` call in `#if DEBUG` so it's clear at the call site:
 
 ```swift
 #if DEBUG
@@ -56,17 +52,38 @@ TweakPanel.install(store: AppTweaks.store)
 #endif
 ```
 
-The ``TweakStore`` DSL and ``TweakStorage`` are available in all builds, so you can define your store unconditionally. Only the UI presentation layer needs the `#if DEBUG` guard.
+The ``TweakStore`` DSL and ``TweakStorage`` are available in all builds, so you can define your store unconditionally. Only the UI presentation layer needs to be gated.
+
+## Using TweakIt in Non-Debug Builds
+
+To enable TweakIt in a release-optimized build (e.g., for internal testing or TestFlight), set ``TweakIt/isEnabled`` to `true` before calling `install()`:
+
+```swift
+#if INTERNAL
+TweakIt.isEnabled = true
+#endif
+TweakPanel.install(store: AppTweaks.store)
+```
+
+Since `isEnabled` is a runtime flag set in your app's own code, it works regardless of build configuration or SPM limitations — no special compiler flags needed on the TweakIt package itself.
+
+A common setup:
+
+| Build Config | App Compilation Conditions | TweakIt Active | Use For |
+|---|---|---|---|
+| Debug | `DEBUG` | Yes (default) | Development |
+| Internal | `INTERNAL` | Yes (opt-in) | Device testing, internal TestFlight |
+| Release | *(none)* | No | App Store |
 
 ## Store Subscript in Release Builds
 
-Note that the ``TweakStore`` subscript reads from ``TweakStorage`` in all builds (it doesn't have `#if DEBUG` gating internally). If you use the subscript in release builds, it will read from UserDefaults. For zero-overhead release access, prefer ``TweakRef``:
+Note that the ``TweakStore`` subscript reads from ``TweakStorage`` in all builds (it doesn't have a runtime guard internally). If you use the subscript in release builds, it will read from UserDefaults. For zero-overhead release access, prefer ``TweakRef``:
 
 ```swift
 // Subscript — reads UserDefaults in all builds:
 let duration: CGFloat = AppTweaks.store["Animations.Spring.duration"]
 
-// TweakRef — returns default directly in release builds:
+// TweakRef — returns default directly when disabled:
 let duration = AppTweaks.duration.value
 ```
 

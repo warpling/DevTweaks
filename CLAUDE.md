@@ -6,7 +6,7 @@ A Swift debug-panel library for runtime parameter tweaking. iOS 16+, SwiftUI, ze
 
 ### Build Verification
 - This is a **public library** consumed via SPM. Breaking changes affect all downstream apps.
-- Always consider **both Debug and Release** build configurations. Code guarded by `#if DEBUG` does not exist in Release builds — any type, property, or method defined inside `#if DEBUG` must only be referenced from other `#if DEBUG` blocks.
+- Always consider **both Debug and Release** build configurations. TweakIt uses a runtime `TweakIt.isEnabled` flag (not compile-time guards) to gate functionality, so all types exist in all builds but no-op when disabled.
 - UIKit is only available when targeting iOS. `swift build` on macOS will fail on UIKit imports — this is expected and not a real error.
 
 ### Objective-C Runtime / Swizzling

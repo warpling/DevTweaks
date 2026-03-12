@@ -14,21 +14,19 @@ import SwiftUI
 /// `didFinishLaunchingWithOptions` before a window scene is connected.
 ///
 /// ```swift
-/// #if DEBUG
+/// TweakIt.isEnabled = true  // opt-in for non-debug builds
 /// TweakPanel.install(store: AppTweaks.store)
-/// #endif
 /// ```
 public enum TweakPanel {
 
-    #if DEBUG
     @available(iOS 16.0, *)
     private static var windowManager: TweakPanelWindowManager?
-    #endif
 
     /// Installs the tweak panel UI.
     ///
     /// Safe to call from `didFinishLaunchingWithOptions` — if no window scene
     /// is connected yet, setup defers automatically until one activates.
+    /// No-ops when `TweakIt.isEnabled` is `false`.
     ///
     /// - Parameters:
     ///   - store: The `TweakStore` containing all tweak definitions.
@@ -48,7 +46,8 @@ public enum TweakPanel {
         shakeToToggleButton: Bool = true,
         onDismiss: (() -> Void)? = nil
     ) {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
+
         let manager = TweakPanelWindowManager(
             store: store,
             tabs: tabs,
@@ -60,16 +59,13 @@ public enum TweakPanel {
         )
         manager.setup()
         windowManager = manager
-        #endif
     }
 
     /// The button state, for toggling visibility from UIKit code.
-    #if DEBUG
     @available(iOS 16.0, *)
     public static var buttonState: TweakPanelButtonState? {
         return windowManager?.buttonState
     }
-    #endif
 
     /// Programmatically presents the tweak panel.
     ///
@@ -77,9 +73,8 @@ public enum TweakPanel {
     ///   When `nil`, the panel restores the last-used tab.
     @available(iOS 16.0, *)
     public static func present(selectingTab: String? = nil) {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
         windowManager?.presentPanel(selectingTab: selectingTab)
-        #endif
     }
 
     /// Creates a `UIWindow` subclass with a two-finger double-tap gesture that opens the panel.
@@ -90,27 +85,20 @@ public enum TweakPanel {
     /// ```
     @available(iOS 16.0, *)
     public static func makeWindow(frame: CGRect) -> UIWindow {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return UIWindow(frame: frame) }
         return TweakGestureWindow(frame: frame)
-        #else
-        return UIWindow(frame: frame)
-        #endif
     }
 
     /// Creates a `UIWindow` subclass with a two-finger double-tap gesture that opens the panel.
     @available(iOS 16.0, *)
     public static func makeWindow(windowScene: UIWindowScene) -> UIWindow {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return UIWindow(windowScene: windowScene) }
         return TweakGestureWindow(windowScene: windowScene)
-        #else
-        return UIWindow(windowScene: windowScene)
-        #endif
     }
 }
 
 // MARK: - Gesture Window
 
-#if DEBUG
 /// A UIWindow that captures two-finger double-tap to present the tweak panel.
 @available(iOS 16.0, *)
 final class TweakGestureWindow: UIWindow {
@@ -145,4 +133,3 @@ final class TweakGestureWindow: UIWindow {
         TweakPanel.present()
     }
 }
-#endif

@@ -5,7 +5,6 @@
 //  Searchable category/section browser for all tweaks.
 //
 
-#if DEBUG
 import SwiftUI
 
 /// Content view for browsing tweaks by category and section.
@@ -176,4 +175,3 @@ private struct SectionRowView: View {
         }
     }
 }
-#endif

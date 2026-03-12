@@ -25,7 +25,7 @@ TweakIt lets you define tweakable parameters once and get a full debug panel for
 - **Custom tabs** — Add your own SwiftUI views alongside the built-in tweaks browser.
 - **Floating button + gesture** — Tap the button or two-finger double-tap anywhere to open.
 - **Section master toggles** — Enable/disable entire feature flag groups with one switch.
-- **`#if DEBUG` safety** — All UI code compiles away in release builds. `TweakRef` returns compile-time defaults with zero overhead.
+- **Release-safe by default** — When disabled, all APIs no-op and `TweakRef` returns defaults directly. Active in `DEBUG` builds automatically, or opt-in for any build config with one line: `TweakIt.isEnabled = true`.
 
 ## Quick Start
 
@@ -60,6 +60,8 @@ enum AppTweaks {
 TweakPanel.install(store: AppTweaks.store)
 #endif
 ```
+
+> **Internal/TestFlight builds:** Set `TweakIt.isEnabled = true` before calling `install()` to enable tweaks in any build config. This works regardless of SPM limitations — no special compiler flags needed on the package itself.
 
 ### 3. Read values
 

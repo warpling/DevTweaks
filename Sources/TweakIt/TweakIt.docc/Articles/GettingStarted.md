@@ -17,7 +17,7 @@ https://github.com/warpling/TweakIt.git
 Or in your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/warpling/TweakIt.git", from: "0.1.0")
+.package(url: "https://github.com/warpling/TweakIt.git", from: "0.3.0")
 ```
 
 Requires iOS 16+ and Swift 5.9+. Zero external dependencies.
@@ -61,6 +61,8 @@ TweakPanel.install(store: AppTweaks.store)
 ```
 
 This adds a floating button and a two-finger double-tap gesture that both open the panel.
+
+> Tip: Want tweaks in a release-optimized build (e.g., for internal TestFlight)? Set `TweakIt.isEnabled = true` before calling `install()`. See <doc:ReleaseBuildSafety> for details.
 
 ## Read Values at Runtime
 

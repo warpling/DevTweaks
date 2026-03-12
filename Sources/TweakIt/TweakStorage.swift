@@ -12,7 +12,7 @@ import Combine
 /// Central storage for all tweak values using UserDefaults.
 ///
 /// Manages persistence of tweak values and tracks which have been modified from their defaults.
-/// In release builds, storage operations are no-ops — `TweakRef` returns defaults directly.
+/// When TweakIt is disabled, storage operations are no-ops — `TweakRef` returns defaults directly.
 public final class TweakStorage: ObservableObject {
 
     private let defaults: UserDefaults
@@ -48,7 +48,8 @@ public final class TweakStorage: ObservableObject {
 
     /// Reads a stored value, returning the default if unmodified.
     public func value<T>(forKey key: String, default defaultValue: T) -> T {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return defaultValue }
+
         let prefixedKey = prefix + key
 
         // If not modified, return default
@@ -81,14 +82,12 @@ public final class TweakStorage: ObservableObject {
         }
 
         return defaultValue
-        #else
-        return defaultValue
-        #endif
     }
 
     /// Stores a value, tracking it as modified. If set back to the default, removes the override.
     public func setValue<T>(_ value: T, forKey key: String, default defaultValue: T) where T: Equatable {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
+
         let prefixedKey = prefix + key
 
         // Check if setting back to default
@@ -117,67 +116,57 @@ public final class TweakStorage: ObservableObject {
             mutableKeys.insert(key)
             modifiedKeys = mutableKeys
         }
-        #endif
     }
 
     // MARK: - Reset
 
     /// Reset a single tweak to its default value.
     public func reset(key: String) {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
+
         let prefixedKey = prefix + key
         defaults.removeObject(forKey: prefixedKey)
         var keys = modifiedKeys
         keys.remove(key)
         modifiedKeys = keys
-        #endif
     }
 
     /// Reset all tweaks in a section (keys starting with sectionPrefix).
     public func resetSection(_ sectionPrefix: String) {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
+
         let keysToReset = modifiedKeys.filter { $0.hasPrefix(sectionPrefix) }
         for key in keysToReset {
             reset(key: key)
         }
-        #endif
     }
 
     /// Reset all tweaks to defaults.
     public func resetAll() {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return }
+
         for key in modifiedKeys {
             let prefixedKey = prefix + key
             defaults.removeObject(forKey: prefixedKey)
         }
         modifiedKeys = []
-        #endif
     }
 
     /// Check if a specific key has been modified.
     public func isModified(key: String) -> Bool {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return false }
         return modifiedKeys.contains(key)
-        #else
-        return false
-        #endif
     }
 
     /// Check if any key in a section has been modified.
     public func isSectionModified(_ sectionPrefix: String) -> Bool {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return false }
         return modifiedKeys.contains { $0.hasPrefix(sectionPrefix) }
-        #else
-        return false
-        #endif
     }
 
     /// Count how many keys in a section have been modified.
     public func modifiedCount(forSection sectionPrefix: String) -> Int {
-        #if DEBUG
+        guard TweakIt.isEnabled else { return 0 }
         return modifiedKeys.filter { $0.hasPrefix(sectionPrefix) }.count
-        #else
-        return 0
-        #endif
     }
 }

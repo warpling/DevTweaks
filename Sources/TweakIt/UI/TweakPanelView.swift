@@ -5,7 +5,6 @@
 //  Root container view — tabbed when custom tabs are provided, single tweaks browser otherwise.
 //
 
-#if DEBUG
 import SwiftUI
 
 // MARK: - Disable Interactive Pop Gesture
@@ -113,4 +112,3 @@ struct TweakPanelView: View {
         .preferredColorScheme(.dark)
     }
 }
-#endif

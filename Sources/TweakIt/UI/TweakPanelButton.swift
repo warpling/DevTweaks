@@ -5,7 +5,6 @@
 //  Floating button that opens the tweak panel. Supports liquid glass on iOS 26+.
 //
 
-#if DEBUG
 import SwiftUI
 
 /// Observable state for the floating button visibility, controllable from UIKit.
@@ -136,4 +135,3 @@ struct TweakPanelFloatingButton: View {
         }
     }
 }
-#endif

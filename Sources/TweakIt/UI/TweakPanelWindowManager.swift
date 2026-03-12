@@ -5,7 +5,6 @@
 //  Manages the floating button window and panel presentation window.
 //
 
-#if DEBUG
 import UIKit
 import SwiftUI
 
@@ -208,4 +207,3 @@ extension UIWindow {
         class_replaceMethod(UIWindow.self, sel, imp_implementationWithBlock(block), method_getTypeEncoding(method))
     }
 }
-#endif

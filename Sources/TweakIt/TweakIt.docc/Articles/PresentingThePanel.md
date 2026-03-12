@@ -16,6 +16,8 @@ TweakPanel.install(store: AppTweaks.store)
 #endif
 ```
 
+> Tip: To include the panel in non-debug builds, set `TweakIt.isEnabled = true` before calling `install()`. See <doc:ReleaseBuildSafety>.
+
 This creates two overlay windows:
 - A **floating button** (bottom-left) that opens the panel on tap
 - A **panel window** that presents the tweaks UI as a sheet

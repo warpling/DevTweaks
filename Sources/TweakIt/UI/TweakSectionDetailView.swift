@@ -5,7 +5,6 @@
 //  Detail view for editing all tweaks in a section.
 //
 
-#if DEBUG
 import SwiftUI
 
 @available(iOS 16.0, *)
@@ -507,4 +506,3 @@ private struct ActionTweakRow: View {
         .buttonStyle(ListHighlightButtonStyle())
     }
 }
-#endif
