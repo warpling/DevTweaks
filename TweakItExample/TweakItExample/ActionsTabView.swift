@@ -41,8 +41,13 @@ struct ActionsTabView: View {
     }
 
     private func presentAlert() {
-        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
+            return
+        }
+
+        // Find the app's own window — skip TweakIt's overlay windows (level > .normal).
+        guard let rootVC = scene.windows
+            .first(where: { $0.windowLevel == .normal })?.rootViewController else {
             return
         }
 
