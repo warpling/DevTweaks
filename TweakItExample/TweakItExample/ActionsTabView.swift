@@ -3,9 +3,8 @@
 //  TweakItExample
 //
 //  Custom tab demonstrating programmatic panel dismissal.
-//  The "Present Alert" button calls SwiftUI's dismiss() then presents
-//  a UIAlertController — the exact flow that requires the panel window
-//  to hide itself after programmatic dismissal.
+//  Tests that the onDismiss callback fires and the panel window
+//  hides after a programmatic dismiss (not just interactive swipe).
 //
 
 import SwiftUI
@@ -16,18 +15,19 @@ struct ActionsTabView: View {
 
     var body: some View {
         List {
-            Section("Dismiss & Present") {
+            Section {
                 Button {
                     dismiss()
-                    // Present an alert on the key window after the panel dismisses.
-                    // Without the KVO fix, the hidden-but-still-blocking panel window
-                    // would swallow all touches on this alert.
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         presentAlert()
                     }
                 } label: {
-                    Label("Present Alert", systemImage: "exclamationmark.bubble")
+                    Label("Dismiss & Present Alert", systemImage: "exclamationmark.bubble")
                 }
+            } header: {
+                Text("Programmatic Dismiss")
+            } footer: {
+                Text("Dismisses the panel via SwiftUI's dismiss(), then presents an alert. The alert title shows whether onDismiss fired. If the alert is not tappable, the panel window is still blocking touches.")
             }
 
             Section("Presets") {
@@ -46,18 +46,26 @@ struct ActionsTabView: View {
             return
         }
 
-        // Walk to the topmost presented VC so the alert isn't behind anything.
         var topVC = rootVC
         while let presented = topVC.presentedViewController {
             topVC = presented
         }
 
+        // Check if onDismiss fired by looking at whether the panel window is hidden.
+        // If KVO fix works: window is hidden, onDismiss fired → "onDismiss: YES"
+        // If broken: window is still visible → "onDismiss: NO" (and this alert won't be tappable)
+        let panelWindowHidden = scene.windows
+            .first(where: { $0.windowLevel == UIWindow.Level.normal + 10 })?
+            .isHidden ?? true
+
         let alert = UIAlertController(
-            title: "It works!",
-            message: "The panel dismissed programmatically and this alert is fully interactive.",
+            title: panelWindowHidden ? "onDismiss: YES" : "onDismiss: NO",
+            message: panelWindowHidden
+                ? "Panel window hidden. Touches work. Everything is correct."
+                : "Panel window still visible. If you can read this, point(inside:) is passing touches but onDismiss did not fire.",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "Nice", style: .default))
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
         topVC.present(alert, animated: true)
     }
 }

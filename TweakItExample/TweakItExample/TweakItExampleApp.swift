@@ -25,7 +25,10 @@ struct TweakItExampleApp: App {
                 ],
                 buttonIcon: "gearshape",
                 buttonInitiallyVisible: useFloating,
-                buttonBottomOffset: 60
+                buttonBottomOffset: 60,
+                onDismiss: {
+                    print("✅ TweakPanel onDismiss fired")
+                }
             )
         }
     }
