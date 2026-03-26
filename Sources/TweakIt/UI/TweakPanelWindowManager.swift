@@ -26,6 +26,7 @@ final class TweakPanelWindowManager: NSObject {
     private var panelWindow: UIWindow?
     private var sceneObserver: NSObjectProtocol?
     private var activationObserver: NSObjectProtocol?
+    private var presentedVCObservation: NSKeyValueObservation?
 
     init(
         store: TweakStore,
@@ -98,6 +99,23 @@ final class TweakPanelWindowManager: NSObject {
         pnlWin.rootViewController = rootVC
         self.panelWindow = pnlWin
 
+        // KVO: hide the panel window whenever `presentedViewController` transitions to nil.
+        // This catches ALL dismissal paths: interactive swipe, "Done" button taps, and
+        // programmatic dismissal via SwiftUI's @Environment(\.dismiss).
+        // `presentationControllerDidDismiss` only fires for interactive dismissals,
+        // which is why KVO is needed here.
+        presentedVCObservation = rootVC.observe(\.presentedViewController, options: [.old, .new]) { [weak self] _, change in
+            // oldValue/newValue are Optional<Optional<UIViewController>> here:
+            // the outer optional indicates whether the option was requested,
+            // the inner optional is the actual property value.
+            let wasPresenting = change.oldValue.flatMap { $0 } != nil
+            let isPresenting = change.newValue.flatMap { $0 } != nil
+            if wasPresenting && !isPresenting {
+                self?.panelWindow?.isHidden = true
+                self?.onDismiss?()
+            }
+        }
+
         // Safety: hide panelWindow if it ends up visible with no sheet after lifecycle transitions
         activationObserver = NotificationCenter.default.addObserver(
             forName: UIScene.didActivateNotification,
@@ -136,7 +154,6 @@ final class TweakPanelWindowManager: NSObject {
             sheet.detents = [.medium(), .large()]
             sheet.selectedDetentIdentifier = .medium
             sheet.prefersGrabberVisible = true
-            sheet.delegate = self
         }
 
         panelWindow.isHidden = false
@@ -144,13 +161,8 @@ final class TweakPanelWindowManager: NSObject {
     }
 }
 
-@available(iOS 16.0, *)
-extension TweakPanelWindowManager: UISheetPresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        panelWindow?.isHidden = true
-        onDismiss?()
-    }
-}
+// UISheetPresentationControllerDelegate was removed — KVO on presentedViewController
+// now handles all dismissal paths (interactive swipe, Done button, programmatic dismiss).
 
 // MARK: - Panel Window
 
