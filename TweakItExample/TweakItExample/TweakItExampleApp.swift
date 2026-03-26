@@ -21,10 +21,14 @@ struct TweakItExampleApp: App {
                     TweakTab("Aurora", icon: "sparkles") { ShaderTabView(categoryName: "Aurora") },
                     TweakTab("Marble", icon: "water.waves") { ShaderTabView(categoryName: "Marble") },
                     TweakTab("Voronoi", icon: "hexagon") { ShaderTabView(categoryName: "Voronoi") },
+                    TweakTab("Actions", icon: "bolt.fill") { ActionsTabView() },
                 ],
                 buttonIcon: "gearshape",
                 buttonInitiallyVisible: useFloating,
-                buttonBottomOffset: 60
+                buttonBottomOffset: 60,
+                onDismiss: {
+                    print("✅ TweakPanel onDismiss fired")
+                }
             )
         }
     }

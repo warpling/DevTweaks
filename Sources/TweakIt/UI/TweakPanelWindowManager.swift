@@ -93,8 +93,12 @@ final class TweakPanelWindowManager: NSObject {
         pnlWin.windowLevel = UIWindow.Level.normal + 10
         pnlWin.backgroundColor = .clear
         pnlWin.isHidden = true
-        let rootVC = UIViewController()
+        let rootVC = PanelRootViewController()
         rootVC.view.backgroundColor = .clear
+        rootVC.onDismissCompletion = { [weak self] in
+            self?.panelWindow?.isHidden = true
+            self?.onDismiss?()
+        }
         pnlWin.rootViewController = rootVC
         self.panelWindow = pnlWin
 
@@ -136,7 +140,6 @@ final class TweakPanelWindowManager: NSObject {
             sheet.detents = [.medium(), .large()]
             sheet.selectedDetentIdentifier = .medium
             sheet.prefersGrabberVisible = true
-            sheet.delegate = self
         }
 
         panelWindow.isHidden = false
@@ -144,11 +147,25 @@ final class TweakPanelWindowManager: NSObject {
     }
 }
 
-@available(iOS 16.0, *)
-extension TweakPanelWindowManager: UISheetPresentationControllerDelegate {
-    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-        panelWindow?.isHidden = true
-        onDismiss?()
+// MARK: - Panel Root View Controller
+
+/// The presenting view controller for the panel sheet.
+/// Overrides `dismiss(animated:completion:)` to detect ALL dismissal paths —
+/// interactive swipe, Done button, and programmatic dismiss via SwiftUI's
+/// `@Environment(\.dismiss)`. UIKit routes all of these through the presenting
+/// VC's `dismiss` method, unlike `presentationControllerDidDismiss` which only
+/// fires for interactive dismissals.
+private class PanelRootViewController: UIViewController {
+    var onDismissCompletion: (() -> Void)?
+
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        let hadPresented = presentedViewController != nil
+        super.dismiss(animated: flag) { [weak self] in
+            completion?()
+            if hadPresented {
+                self?.onDismissCompletion?()
+            }
+        }
     }
 }
 
